@@ -69,21 +69,25 @@ window.countNRooksSolutions = function(n) {
             matrix[k][l] = 1;
             rooks++;
           }
-          restrictedRows[k] = k;
-          restrictedRows[l] = l;
+          restrictedRows[k] = k; //this should move up
+          restrictedRows[l] = l; //this should move up
         }
       }
-    }
-    if (startColI < n) {
-      startColI++;
-    } else {
-      startRowI++;
-      startColI = 0;
     }
     if (rooks === n) {
       solutionCount++;
     }
-    if (startColI <= n - 1 && startRowI <= n - 1) {
+
+    if (startColI < n - 1 && startRowI < n - 1) {
+
+      if (startColI < n) {
+        startColI++;
+      } else {
+        startRowI++;
+        startColI = 0;
+      }
+      restrictedRows = {};
+      restrictedCols = {};
       placeRooks(startRowI, startColI);
     }
   };
