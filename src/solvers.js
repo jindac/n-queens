@@ -35,64 +35,44 @@ window.findNRooksSolution = function(n) {
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutionCount = 0; //fixme
-
-  var newMatrix = function(n) {
-    var matrix = [];
-    for (var i = 0; i < n; i++) {
-      var row = [];
-      for (var j = 0; j < n; j++) {
-        row.push(null);
-      }
-      matrix.push(row);
-    }
-    return matrix;
-  };
-
-  var restrictedRows = {};
-  var restrictedCols = {};
-  var rooks = 0;
-  var startRowI = 0;
-  var startColI = 0;
-  var placeRooks = function(rowI, colI) {
-    var matrix = newMatrix(n);
-    // console.log('matrix = ', matrix);
-    debugger;
-    matrix[rowI][colI] = 1;
-    debugger;
-    restrictedRows[rowI] = rowI;
-    restrictedCols[colI] = colI;
-    rooks = 1;
-    for (var k = 0; k < n; k++) { // row index
-      for (var l = 0; l < n; l++) { // column index
-        if (matrix[k][l] !== 1) {
-          if (restrictedRows[k] !== undefined && restrictedCols[l] !== undefined) {
-            matrix[k][l] = 1;
-            rooks++;
-          }
-          restrictedRows[k] = k; //this should move up
-          restrictedRows[l] = l; //this should move up
-        }
+  var callCount = 0;
+  var solutionsArr = [];
+  var pickNext = function() {
+    
+    var choices = _.range(0, n);
+    var previousRooks = [...arguments];
+    // for (var k = 0; k < arguments.length; k++) {
+    //   previousRooks[k] = arguments[k];
+    // }999
+    // console.log('previousRooks:', previousRooks);
+    for (var i = 0; i < choices.length; i++) { // iterate through previousRooks and place previous rooks and remove those positions from choices
+      if (previousRooks.indexOf(choices[i]) !== -1) {
+        choices.splice(i, 1);
+        i--;
       }
     }
-    if (rooks === n) {
-      solutionCount++;
-    }
-
-    if (startColI < n - 1 && startRowI < n - 1) {
-
-      if (startColI < n) {
-        startColI++;
+    for (var j = 0; j < choices.length; j++) { // iterate through choices and place next rooks
+      let nextRook = [...previousRooks];
+      nextRook.push(choices[j]); //place rook
+      if (choices.length > 1) {
+        callCount++;
+        pickNext(...nextRook); //place next rook
       } else {
-        startRowI++;
-        startColI = 0;
+        solutionCount++;
+        solutionsArr.push(nextRook); //end
       }
-      restrictedRows = {};
-      restrictedCols = {};
-      placeRooks(startRowI, startColI);
     }
   };
-  placeRooks(startRowI, startColI);
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  if (n === 0 || n === 1) {
+    return 1;
+  }
+  for (var i = 0; i < n; i++) {
+    callCount++;
+    // console.log('calling on i = ', i);
+    pickNext(i);
+  }
+  // console.log('all solutions: ', solutionsArr);
+  console.log('n = ', n, ' and solutionCount = ', solutionCount, 'callCount = ', callCount);
   return solutionCount;
 };
 
@@ -111,3 +91,56 @@ window.countNQueensSolutions = function(n) {
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
+
+  // var newMatrix = function(n) {
+  //   var matrix = [];
+  //   for (var i = 0; i < n; i++) {
+  //     var row = [];
+  //     for (var j = 0; j < n; j++) {
+  //       row.push(null);
+  //     }
+  //     matrix.push(row);
+  //   }
+  //   return matrix;
+  // };
+  // var restrictedRows = {};
+  // var restrictedCols = {};
+  // var rooks = 0;
+  // var startRowI = 0;
+  // var startColI = 0;
+  // var placeRooks = function(rowI, colI) {
+  //   var matrix = newMatrix(n);
+  //   matrix[rowI][colI] = 1;
+  //   restrictedRows[rowI] = rowI;
+  //   restrictedCols[colI] = colI;
+  //   rooks = 1;
+  //   for (var k = 0; k < n; k++) { // row index
+  //     for (var l = 0; l < n; l++) { // column index
+  //       if (matrix[k][l] !== 1) {
+  //         if (restrictedRows[k] !== undefined && restrictedCols[l] !== undefined) {
+  //           matrix[k][l] = 1;
+  //           rooks++;
+  //         }
+  //         restrictedRows[k] = k; //this should move up
+  //         restrictedRows[l] = l; //this should move up
+  //       }
+  //     }
+  //   }
+  //   if (rooks === n) {
+  //     solutionCount++;
+  //   }
+  //   if (startColI < n - 1 && startRowI < n - 1) {
+
+  //     if (startColI < n) {
+  //       startColI++;
+  //     } else {
+  //       startRowI++;
+  //       startColI = 0;
+  //     }
+  //     restrictedRows = {};
+  //     restrictedCols = {};
+  //     placeRooks(startRowI, startColI);
+  //   }
+  // };
+  // placeRooks(startRowI, startColI);
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
